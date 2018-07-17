@@ -77,15 +77,15 @@ namespace WebApplication.Test
         [Fact]
         public async Task should_get_city_be_name()
         {
-            HttpResponseMessage responseMsg = await Client.GetAsync("http://www.bd.com/CityLocation?Beijing&0x4396");
+            HttpResponseMessage responseMsg = await Client.GetAsync("http://www.bd.com/CityLocation/Beijing&0x4396");
             string cityString = await responseMsg.Content.ReadAsAsync<string>();
-
             CityDto city = JsonConvert.DeserializeObject<CityDto>(cityString);
 
             Assert.Equal(50, city.X);
             Assert.Equal(50, city.Y);
         }
 
+        // complex type from body
         [Fact]
         public async Task should_post_city()
         {
@@ -103,20 +103,26 @@ namespace WebApplication.Test
             Assert.Equal(58, city.Y);
             Assert.Equal("Wuhan", city.CityName);
         }
-
         [Fact]
-        public async Task should_post_city_string()
+        public async Task should_post_null_city()
         {
-            HttpResponseMessage response = await Client.PostAsync(
-                new Uri("http://bd.com/CreateOneCityAsString/Wuhan"),
-                default(StringContent));
+            HttpResponseMessage response = await Client.PostAsJsonAsync(
+                new Uri("http://bd.com/CreateOneCity"),
+                new CityDto());
 
             string cityString = await response.Content.ReadAsStringAsync();
-            output.WriteLine(cityString);
-        }
 
+            output.WriteLine(cityString);
+
+            var city = JsonConvert.DeserializeObject<CityDto>(cityString);
+
+            Assert.Equal(default(int), city.X);
+            Assert.Equal(default(int), city.Y);
+            Assert.Equal(default(string), city.CityName);
+        }
+        //complex type from uri
         [Fact]
-        public async Task should_post_city_query_string()
+        public async Task should_post_city_query_string_from_uri()
         {
             HttpResponseMessage response = await Client.PostAsync(
                 new Uri("http://bd.com/CreateOneCityByQueryString/?X=101&Y=102&CityName=Shenzhen"),
@@ -129,6 +135,56 @@ namespace WebApplication.Test
             Assert.Equal(102, city.Y);
             Assert.Equal("Shenzhen", city.CityName);
         }
+
+        [Fact]
+        public async Task should_post_part_city_query_string_from_uri()
+        {
+            HttpResponseMessage response = await Client.PostAsync(
+                new Uri("http://bd.com/CreateOneCityByQueryString/?Y=102"),
+                default(StringContent));
+            string cityString = await response.Content.ReadAsStringAsync();
+            output.WriteLine(cityString);
+            var city = JsonConvert.DeserializeObject<CityDto>(cityString);
+
+            Assert.Equal(default(int), city.X);
+            Assert.Equal(102, city.Y);
+            Assert.Equal(default(string), city.CityName);
+        }
+        //simple type from body
+        [Fact]
+        public async Task should_post_city_string()
+        {
+            HttpResponseMessage response = await Client.PostAsync(
+                new Uri("http://bd.com/CreateOneCityAsString"),
+                new StringContent(
+                    "'Wuhan'", // JSON string
+                    Encoding.UTF8,
+                    "application/json"));
+
+
+            string cityName = await response.Content.ReadAsStringAsync();
+            output.WriteLine(cityName);
+            Assert.Equal("\"Wuhan\"", cityName);
+        }
+        [Fact]
+        public async Task should_post_city_x()
+        {
+            HttpResponseMessage response = await Client.PostAsync(
+                new Uri("http://bd.com/PostCityX/101"),
+                null);
+            int x = await response.Content.ReadAsAsync<int>();
+            Assert.Equal(101, x);
+        }
+        [Fact]
+        public async Task should_post_city_null_x()
+        {
+            HttpResponseMessage response = await Client.PostAsync(
+                new Uri("http://bd.com/PostCityX/"),
+                null);
+            HttpStatusCode code = response.StatusCode;
+            Assert.Equal(HttpStatusCode.NotFound, code);
+        }
+
         
     }
 }

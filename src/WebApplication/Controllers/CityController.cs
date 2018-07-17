@@ -44,11 +44,11 @@ namespace WebApplication.Controllers
                 city);
         }
         [HttpPost]
-        public HttpResponseMessage PostOneCityAsString([FromUri]string cityString)
+        public HttpResponseMessage PostOneCityAsString([FromBody]string cityName)
         {
             return Request.CreateResponse(
                 HttpStatusCode.OK,
-                cityString);
+                cityName);
             
         }
 
@@ -58,6 +58,14 @@ namespace WebApplication.Controllers
             return Request.CreateResponse(
                 HttpStatusCode.OK,
                 city);
+        }
+
+        [HttpPost]
+        public HttpResponseMessage PostCityX([FromUri] int x)
+        {
+            return Request.CreateResponse(
+                HttpStatusCode.OK,
+                x);
         }
     }
 }

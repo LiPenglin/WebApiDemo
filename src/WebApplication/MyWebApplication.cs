@@ -35,13 +35,18 @@ namespace WebApplication
 
             routes.MapHttpRoute(
                 "post city string",
-                "CreateOneCityAsString/{CityString}",
+                "CreateOneCityAsString",
                 new {controller = "City", action = "PostOneCityAsString"},
                 new {httpMethod = new HttpMethodConstraint(HttpMethod.Post)});
             routes.MapHttpRoute(
                 "post city query string",
                 "CreateOneCityByQueryString",
                 new {controller = "City", action = "PostOneCityAsQueryString"},
+                new {httpMethod = new HttpMethodConstraint(HttpMethod.Post)});
+            routes.MapHttpRoute(
+                "post city x",
+                "PostCityX/{X}",
+                new {controller = "City", action = "PostCityX"},
                 new {httpMethod = new HttpMethodConstraint(HttpMethod.Post)});
         }
     }
