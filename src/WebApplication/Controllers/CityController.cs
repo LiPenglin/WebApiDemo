@@ -1,15 +1,20 @@
-﻿using System.Collections;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace WebApplication.Controllers
 {
     public class CityController : ApiController
     {
+        readonly CityFormattingService cityFormattingService;
+
+        public CityController(CityFormattingService cityService)
+        {
+            this.cityFormattingService = cityService;
+        }
+
         [HttpGet]
         public HttpResponseMessage GetCity()
         {
@@ -41,8 +46,9 @@ namespace WebApplication.Controllers
         {
             return Request.CreateResponse(
                 HttpStatusCode.OK,
-                city);
+                cityFormattingService.CreateCity(city.X, city.Y, city.CityName));
         }
+
         [HttpPost]
         public HttpResponseMessage PostOneCityAsString([FromBody]string cityName)
         {
